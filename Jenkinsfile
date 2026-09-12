@@ -4,6 +4,10 @@ pipeline {
         label 'Node-1'
     }
 
+    environment {
+        def version = ""
+    }
+
     stages {
 
         stage('Read Version') {
@@ -14,7 +18,7 @@ pipeline {
                     def pkg = readJSON file: 'package.json'
 
                     // Extract version
-                    def version = pkg.version
+                    version = pkg.version
 
                     // Print version
                     echo "Package version: ${version}"
