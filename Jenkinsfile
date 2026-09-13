@@ -36,7 +36,7 @@ pipeline {
         stage('Docker build') {
             steps {
                 script {
-                    withCredentials([$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']) {
+                    withCredentials(credentials: 'aws-creds', region: 'us-east-1') {
                         sh """
                             aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 637423198678.dkr.ecr.us-east-1.amazonaws.com
                             docker build -t 637423198678.dkr.ecr.us-east-1.amazonaws.com/roboshop/catalogue:${version} .
