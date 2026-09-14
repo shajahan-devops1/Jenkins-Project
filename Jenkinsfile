@@ -33,13 +33,21 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
+        stage('Trivy Dockerfile Scan') {
             steps {
-                withSonarQubeEnv('sonar-scanner') {
-                    sh "${tool 'sonar-8'}/bin/sonar-scanner"
-                }
+                sh """
+                    trivy config --exit-code 1 --severity HIGH,CRITICAL --format table .
+                """
             }
         }
+
+        // stage('SonarQube Analysis') {
+        //     steps {
+        //         withSonarQubeEnv('sonar-scanner') {
+        //             sh "${tool 'sonar-8'}/bin/sonar-scanner"
+        //         }
+        //     }
+        // }
         stage('Docker build') {
             steps {
                 script {
@@ -47,11 +55,31 @@ pipeline {
                         sh """
                             aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 906303433456.dkr.ecr.us-east-1.amazonaws.com
                             docker build -t 906303433456.dkr.ecr.us-east-1.amazonaws.com/roboshop/catalogue:${version} .
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Trivy Image Scan') {
+            steps {
+                sh """
+                    trivy image --scanners vuln --pkg-types os --exit-code 1 --severity HIGH,CRITICAL --format table 160885265516.dkr.ecr.us-east-1.amazonaws.com/roboshop/catalogue:${version}
+                """
+            }
+        }
+
+        stage('Docker Push') {
+            steps {
+                script {
+                    withAWS(credentials: 'aws-creds', region: 'us-east-1') {
+                        sh """
                             docker push 906303433456.dkr.ecr.us-east-1.amazonaws.com/roboshop/catalogue:${version}
                         """
                     }
                 }
             }
+
         }
 
     }
