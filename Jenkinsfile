@@ -35,8 +35,8 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('Sonar-scanner') {
-                    sh "${tool 'sonarscan-8'}/bin/sonar-scanner"
+                withSonarQubeEnv('sonar-scanner') {         #withSonarQubeEnv() should have the same name as the SonarQube server configured in Jenkins under system configuration
+                    sh "${tool 'sonar-8'}/bin/sonar-scanner"        #name should match the name mentioned in tools configuration in Jenkins
                 }
             }
         }
@@ -45,9 +45,9 @@ pipeline {
                 script {
                     withAWS(credentials: 'aws-creds', region: 'us-east-1') {
                         sh """
-                            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 533267079470.dkr.ecr.us-east-1.amazonaws.com
-                            docker build -t 533267079470.dkr.ecr.us-east-1.amazonaws.com/roboshop/catalogue:${version} .
-                            docker push 533267079470.dkr.ecr.us-east-1.amazonaws.com/roboshop/catalogue:${version}
+                            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 906303433456.dkr.ecr.us-east-1.amazonaws.com
+                            docker build -t 906303433456.dkr.ecr.us-east-1.amazonaws.com/roboshop/catalogue:${version} .
+                            docker push 906303433456.dkr.ecr.us-east-1.amazonaws.com/roboshop/catalogue:${version}
                         """
                     }
                 }
