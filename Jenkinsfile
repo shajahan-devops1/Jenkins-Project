@@ -32,7 +32,13 @@ pipeline {
                 sh "npm install"
             }
         }
-        
+
+        stage('SonarQube Analysis') {
+            steps {
+            withSonarQubeEnv('sonar-scan') {
+                sh "${tool 'sonarscan-8'}/bin/sonar-scanner"
+            }
+        }
         stage('Docker build') {
             steps {
                 script {
