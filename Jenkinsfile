@@ -64,7 +64,7 @@ pipeline {
         stage('Trivy Image Scan') {
             steps {
                 sh """
-                    trivy image --scanners vuln --pkg-types os --exit-code 1 --severity HIGH,CRITICAL --format table 160885265516.dkr.ecr.us-east-1.amazonaws.com/roboshop/catalogue:${version}
+                    trivy image --quiet --cache-dir /home/ec2-user/.trivy-cache --scanners vuln --pkg-types os --exit-code 1 --severity HIGH,CRITICAL --format table 160885265516.dkr.ecr.us-east-1.amazonaws.com/roboshop/catalogue:${version}
                 """
             }
         }
@@ -74,6 +74,7 @@ pipeline {
                 script {
                     withAWS(credentials: 'aws-creds', region: 'us-east-1') {
                         sh """
+                            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 906303433456.dkr.ecr.us-east-1.amazonaws.com
                             docker push 906303433456.dkr.ecr.us-east-1.amazonaws.com/roboshop/catalogue:${version}
                         """
                     }
