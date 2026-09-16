@@ -1,3 +1,8 @@
 @Library('jenkins-shared-library') _
 
-testPipeline()
+
+def configMap = [
+    project: 'roboshop',
+    component: 'catalogue'
+]
+testPipeline(configMap)
