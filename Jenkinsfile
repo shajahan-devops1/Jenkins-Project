@@ -5,4 +5,10 @@ def configMap = [
     project: 'roboshop',
     component: 'catalogue'
 ]
-testPipeline(configMap)
+
+if (env.BRANCH_NAME == 'main') {
+    echo "This is the main branch. Proceeding with the pipeline."
+}
+else {
+    testPipeline(configMap)
+}
